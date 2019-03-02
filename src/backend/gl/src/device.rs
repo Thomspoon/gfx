@@ -438,7 +438,7 @@ impl Device {
                 );
 
                 let glsl = self.translate_spirv(&mut ast).unwrap();
-                info!("Generated:\n{:?}", glsl);
+                debug!("SPIRV-Cross generated shader:\n{}", glsl);
                 let shader = match self
                     .create_shader_module_from_source(glsl.as_bytes(), stage)
                     .unwrap()

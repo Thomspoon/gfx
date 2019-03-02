@@ -386,6 +386,22 @@ impl CommandQueue {
                     error!("Instanced indexed drawing is not supported");
                 }
             }
+            com::Command::DrawIndirect {
+                primitive,
+                offset,
+                draw_count
+            } => {
+                let gl = &self.share.context;
+
+                unsafe {
+                    gl.DrawArraysInstanced(
+                        primitive,
+                        offset as _,
+                        draw_count as _,
+                        0,
+                    );
+                }
+            }
             com::Command::Dispatch(count) => {
                 // Capability support is given by which queue types will be exposed.
                 // If there is no compute support, this pattern should never be reached
@@ -708,11 +724,14 @@ impl CommandQueue {
                },
                com::Command::UnbindAttribute(slot) => unsafe {
                    self.share.context.DisableVertexAttribArray(slot as gl::types::GLuint);
-               },
+               },*/
                com::Command::BindUniform(loc, uniform) => {
                    let gl = &self.share.context;
-                   shade::bind_uniform(gl, loc as gl::types::GLint, uniform);
-               },
+                   let data = Self::get::<u32>(data_buf, uniform);
+                   unsafe {
+                       gl.Uniform1uiv(loc as _, data.len() as _, data.as_ptr() as _);
+                   }
+               },/*
                com::Command::SetRasterizer(rast) => {
                    state::bind_rasterizer(&self.share.context, &rast, self.share.info.version.is_embedded);
                },

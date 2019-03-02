@@ -67,8 +67,14 @@ pub enum Command {
         base_vertex: hal::VertexOffset,
         instances: Range<hal::InstanceCount>,
     },
+    DrawIndirect {
+        primitive: gl::types::GLenum,
+        offset: buffer::Offset,
+        draw_count: hal::DrawCount,
+    },
     BindIndexBuffer(gl::types::GLuint),
     //BindVertexBuffers(BufferSlice),
+    BindUniform(gl::types::GLuint, BufferSlice),
     SetViewports {
         first_viewport: u32,
         viewport_ptr: BufferSlice,
@@ -1225,11 +1231,25 @@ impl command::RawCommandBuffer<Backend> for RawCommandBuffer {
     unsafe fn draw_indirect(
         &mut self,
         _buffer: &n::Buffer,
-        _offset: buffer::Offset,
-        _draw_count: hal::DrawCount,
+        offset: buffer::Offset,
+        draw_count: hal::DrawCount,
         _stride: u32,
     ) {
-        unimplemented!()
+        self.bind_attributes();
+
+        match self.cache.primitive {
+            Some(primitive) => {
+                self.push_cmd(Command::DrawIndirect {
+                    primitive,
+                    offset,
+                    draw_count
+                });
+            }
+            None => {
+                warn!("No primitive bound. An active pipeline needs to be bound before calling `draw`.");
+                self.cache.error_state = true;
+            }
+        }
     }
 
     unsafe fn draw_indexed_indirect(
@@ -1274,10 +1294,14 @@ impl command::RawCommandBuffer<Backend> for RawCommandBuffer {
         &mut self,
         _layout: &n::PipelineLayout,
         _stages: pso::ShaderStageFlags,
-        _offset: u32,
-        _constants: &[u32],
+        offset: u32,
+        constants: &[u32],
     ) {
-        unimplemented!()
+        let constants = self.add(constants);
+        self.push_cmd(Command::BindUniform(
+            offset,
+            constants
+        ));
     }
 
     unsafe fn push_compute_constants(
