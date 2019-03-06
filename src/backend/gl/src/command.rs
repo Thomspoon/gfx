@@ -74,7 +74,7 @@ pub enum Command {
     },
     BindIndexBuffer(gl::types::GLuint),
     //BindVertexBuffers(BufferSlice),
-    BindUniform(gl::types::GLuint, BufferSlice),
+    BindUniform(gl::types::GLuint, gl::types::GLuint, BufferSlice),
     SetViewports {
         first_viewport: u32,
         viewport_ptr: BufferSlice,
@@ -176,6 +176,8 @@ struct Cache {
     vertex_buffer_descs: Vec<Option<pso::VertexBufferDesc>>,
     // Active attributes.
     attributes: Vec<n::AttributeDesc>,
+    // Active uniforms
+    uniforms: Vec<
 }
 
 impl Cache {
@@ -404,6 +406,8 @@ impl RawCommandBuffer {
             }
         }
     }
+
+    pub(crate) fn  
 
     fn begin_subpass(&mut self) {
         // Split processing and command recording due to borrowchk.
@@ -1299,6 +1303,7 @@ impl command::RawCommandBuffer<Backend> for RawCommandBuffer {
     ) {
         let constants = self.add(constants);
         self.push_cmd(Command::BindUniform(
+            self.cache.program.unwrap(), // TODO handle error case of no program
             offset,
             constants
         ));

@@ -293,6 +293,13 @@ pub struct AttributeDesc {
     pub(crate) vertex_attrib_fn: VertexAttribFunction,
 }
 
+#[derive(Clone, Debug)]
+pub struct UniformDesc {
+    pub(crate) location: gl::types::GLuint,
+    pub(crate) size: gl::types::GLint,
+    pub(crate) type: gl::types::GLenum,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum VertexAttribFunction {
     Float,   // glVertexAttribPointer

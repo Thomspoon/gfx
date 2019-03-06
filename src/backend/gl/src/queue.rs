@@ -725,12 +725,20 @@ impl CommandQueue {
                com::Command::UnbindAttribute(slot) => unsafe {
                    self.share.context.DisableVertexAttribArray(slot as gl::types::GLuint);
                },*/
-               com::Command::BindUniform(loc, uniform) => {
+               com::Command::BindUniform(program, loc, uniform) => {
                    let gl = &self.share.context;
-                   let data = Self::get::<u32>(data_buf, uniform);
+                   let mut data_type: u32 = 0;
+                   let mut data_size: i32 = 0;
                    unsafe {
-                       gl.Uniform1uiv(loc as _, data.len() as _, data.as_ptr() as _);
+
+                       gl.GetActiveUniform(program, 0, 0, ptr::null_mut(), &mut data_size as _, &mut data_type as _, ptr::null_mut());
+                       println!("{:?}, {:?}", data_type, data_size);
                    }
+                   panic!("Testing");
+                   //let data = Self::get::<u32>(data_buf, uniform);
+                   //unsafe {
+                   //    gl.Uniform1uiv(loc as _, data.len() as _, data.as_ptr() as _);
+                   //}
                },/*
                com::Command::SetRasterizer(rast) => {
                    state::bind_rasterizer(&self.share.context, &rast, self.share.info.version.is_embedded);
