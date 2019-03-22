@@ -779,9 +779,7 @@ impl CommandQueue {
                                 gl.UniformMatrix3fv(uniform.location as _, 1, gl::FALSE, data[0].as_ptr());
                             },
                             gl::FLOAT_MAT4 => {
-                                println!("MAT4!");
                                 let data = Self::get::<[f32; 16]>(data_buf, buffer);
-                                println!("Giving data to UniformMatrix4fv: {:?}", data[0]);
                                 gl.UniformMatrix4fv(uniform.location as _, 1, gl::FALSE, data[0].as_ptr());
                             },
                             _ => panic!("Unsupported uniform datatype!"),
