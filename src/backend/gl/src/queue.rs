@@ -386,22 +386,6 @@ impl CommandQueue {
                     error!("Instanced indexed drawing is not supported");
                 }
             }
-            com::Command::DrawIndirect {
-                primitive,
-                offset,
-                draw_count
-            } => {
-                let gl = &self.share.context;
-
-                unsafe {
-                    gl.DrawArraysInstanced(
-                        primitive,
-                        offset as _,
-                        draw_count as _,
-                        0,
-                    );
-                }
-            }
             com::Command::Dispatch(count) => {
                 // Capability support is given by which queue types will be exposed.
                 // If there is no compute support, this pattern should never be reached

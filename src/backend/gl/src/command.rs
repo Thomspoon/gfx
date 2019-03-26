@@ -67,11 +67,6 @@ pub enum Command {
         base_vertex: hal::VertexOffset,
         instances: Range<hal::InstanceCount>,
     },
-    DrawIndirect {
-        primitive: gl::types::GLenum,
-        offset: buffer::Offset,
-        draw_count: hal::DrawCount,
-    },
     BindIndexBuffer(gl::types::GLuint),
     //BindVertexBuffers(BufferSlice),
     BindUniform {
@@ -450,7 +445,7 @@ impl RawCommandBuffer {
                     // All attachments specified in the renderpass must have a valid,
                     // matching image view bound in the framebuffer.
                     let view_format = attachment.format.unwrap();
-
+                    
                     // Clear color target
                     if view_format.is_color() {
                         if let Some(cv) = clear.value {
@@ -489,7 +484,7 @@ impl RawCommandBuffer {
                         } else {
                             None
                         };
-
+                        println!("depth: {:?}", depth);
                         if depth.is_some() || stencil.is_some() {
                             return Some(Command::ClearBufferDepthStencil(depth, stencil));
                         }
@@ -1240,25 +1235,11 @@ impl command::RawCommandBuffer<Backend> for RawCommandBuffer {
     unsafe fn draw_indirect(
         &mut self,
         _buffer: &n::Buffer,
-        offset: buffer::Offset,
-        draw_count: hal::DrawCount,
+        _offset: buffer::Offset,
+        _draw_count: hal::DrawCount,
         _stride: u32,
     ) {
-        self.bind_attributes();
-
-        match self.cache.primitive {
-            Some(primitive) => {
-                self.push_cmd(Command::DrawIndirect {
-                    primitive,
-                    offset,
-                    draw_count
-                });
-            }
-            None => {
-                warn!("No primitive bound. An active pipeline needs to be bound before calling `draw`.");
-                self.cache.error_state = true;
-            }
-        }
+        unimplemented!()
     }
 
     unsafe fn draw_indexed_indirect(
