@@ -88,6 +88,7 @@ pub fn map_comparison(cmp: pso::Comparison) -> gl::types::GLenum {
 }
 
 pub(crate) fn bind_depth(gl: &GlContainer, depth: &pso::DepthTest) {
+    println!("Bind depth!");
     match *depth {
         pso::DepthTest::On { fun, write } => unsafe {
             gl.Enable(gl::DEPTH_TEST);

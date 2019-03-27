@@ -266,12 +266,14 @@ pub struct RenderPass {
 #[derive(Clone, Debug)]
 pub struct SubpassDesc {
     pub(crate) color_attachments: Vec<usize>,
+    pub(crate) depth_stencil: Option<usize>,
 }
 
 impl SubpassDesc {
     /// Check if an attachment is used by this sub-pass.
     pub(crate) fn is_using(&self, at_id: pass::AttachmentId) -> bool {
-        self.color_attachments.iter().any(|id| *id == at_id)
+        self.color_attachments.iter().any(|id| *id == at_id) ||
+        (self.depth_stencil.is_some() && self.depth_stencil.unwrap() == at_id)
     }
 }
 

@@ -133,7 +133,7 @@ pub type FrameBufferTarget = gl::types::GLenum;
 pub type AttachmentPoint = gl::types::GLenum;
 pub type DrawBuffer = gl::types::GLint;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct AttachmentClear {
     subpass_id: Option<pass::SubpassId>,
     value: Option<command::ClearValueRaw>,
@@ -445,7 +445,7 @@ impl RawCommandBuffer {
                     // All attachments specified in the renderpass must have a valid,
                     // matching image view bound in the framebuffer.
                     let view_format = attachment.format.unwrap();
-                    
+
                     // Clear color target
                     if view_format.is_color() {
                         if let Some(cv) = clear.value {
@@ -471,23 +471,23 @@ impl RawCommandBuffer {
 
                             return Some(cmd);
                         }
-                    } else {
-                        // Clear depth-stencil target
-                        let depth = if view_format.is_depth() {
-                            clear.value.map(|cv| unsafe { cv.depth_stencil.depth })
-                        } else {
-                            None
-                        };
+                    } 
 
-                        let stencil = if view_format.is_stencil() {
-                            clear.stencil_value
-                        } else {
-                            None
-                        };
-                        println!("depth: {:?}", depth);
-                        if depth.is_some() || stencil.is_some() {
-                            return Some(Command::ClearBufferDepthStencil(depth, stencil));
-                        }
+                    // Clear depth-stencil target
+                    let depth = if view_format.is_depth() {
+                        clear.value.map(|cv| unsafe { cv.depth_stencil.depth })
+                    } else {
+                        None
+                    };
+
+                    let stencil = if view_format.is_stencil() {
+                        clear.stencil_value
+                    } else {
+                        None
+                    };
+
+                    if depth.is_some() || stencil.is_some() {
+                        return Some(Command::ClearBufferDepthStencil(depth, stencil));
                     }
 
                     None

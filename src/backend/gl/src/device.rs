@@ -601,14 +601,20 @@ impl d::Device<B> for Device {
         let subpasses = subpasses
             .into_iter()
             .map(|subpass| {
+                let subpass = subpass.borrow();
                 let color_attachments = subpass
-                    .borrow()
                     .colors
                     .iter()
                     .map(|&(index, _)| index)
                     .collect();
+                
+                let depth_stencil = if subpass.depth_stencil.is_some() {
+                    Some(subpass.depth_stencil.unwrap().0)
+                } else {
+                    None
+                };
 
-                n::SubpassDesc { color_attachments }
+                n::SubpassDesc { color_attachments, depth_stencil }
             })
             .collect();
 

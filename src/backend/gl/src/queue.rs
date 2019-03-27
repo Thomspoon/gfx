@@ -488,16 +488,15 @@ impl CommandQueue {
                     .ClearBufferiv(gl::COLOR, draw_buffer, cv.as_ptr());
             },
             com::Command::ClearBufferDepthStencil(depth, stencil) => unsafe {
-                let (target, depth, stencil) = match (depth, stencil) {
-                    (Some(depth), Some(stencil)) => (gl::DEPTH_STENCIL, depth, stencil),
-                    (Some(depth), None) => (gl::DEPTH, depth, 0),
-                    (None, Some(stencil)) => (gl::STENCIL, 0.0, stencil),
+                let (depth, stencil) = match (depth, stencil) {
+                    (Some(depth), Some(stencil)) => (depth, stencil),
+                    (Some(depth), None) => (depth, 0),
+                    (None, Some(stencil)) => (0.0, stencil),
                     _ => unreachable!(),
                 };
-
                 self.share
                     .context
-                    .ClearBufferfi(target, 0, depth, stencil as _);
+                    .ClearBufferfi(gl::DEPTH_STENCIL, 0, depth, stencil as _);
             },
             com::Command::ClearTexture(_color) => unimplemented!(),
             com::Command::DrawBuffers(draw_buffers) => unsafe {
